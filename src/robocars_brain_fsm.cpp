@@ -179,6 +179,8 @@ int main(int argc, char **argv)
 
     fsm_list::start();
 
+    ROS_INFO("Brain: Starting");
+
     // wait for FCU connection
     ros::Rate rate(500.0);
     while(ros::ok()){
