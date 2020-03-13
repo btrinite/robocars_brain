@@ -146,7 +146,7 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 
 add_executable(offb_vel_node src/offb_vel_node.cpp)
-add_executable(offb_fsm_raw_node src/offb_fsm_raw_node.cpp)
+add_executable(robocars_brain_fsm src/robocars_brain_fsm.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -156,15 +156,14 @@ add_executable(offb_fsm_raw_node src/offb_fsm_raw_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(offb_vel_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(offb_fsm_raw_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(robocars_brain_fsm ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 
 target_link_libraries(offb_vel_node
   ${catkin_LIBRARIES}
 )
-target_link_libraries(offb_fsm_raw_node
+target_link_libraries(robocars_brain_fsm
   ${catkin_LIBRARIES}
 )
 #############
