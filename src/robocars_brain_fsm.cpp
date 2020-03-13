@@ -154,7 +154,7 @@ void RosInterface::channels_msg_cb(const robocars_msgs::robocars_radio_channels:
         }
     }
     
-    newCmd.steeringCmd = msg->ch3;
+    newCmd.throttlingCmd = msg->ch3;
     newCmd.steeringCmd = msg->ch1;
     send_event(PowerTraindEvent(&newCmd));        
 }
