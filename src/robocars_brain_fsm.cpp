@@ -119,9 +119,9 @@ void RosInterface::channels_msg_cb(const robocars_msgs::robocars_radio_channels:
 
     static u_int32_t last_ch5 = 0;
     static u_int32_t last_ch6 = 0;
-    if (msg.ch5 != last_ch5) {
+    if (msg->ch5 != last_ch5) {
         //transition
-        last_ch5=msg.ch5;
+        last_ch5=msg->ch5;
         switch (channel2Command(last_ch5)) {
             case CMD_OFF:
                 send_event(DisarmedEvent());        
@@ -131,9 +131,9 @@ void RosInterface::channels_msg_cb(const robocars_msgs::robocars_radio_channels:
             break;
         }
     }
-    if (msg.ch6 != last_ch6) {
+    if (msg->ch6 != last_ch6) {
         //transition
-        last_ch6=msg.ch6;
+        last_ch6=msg->ch6;
         switch (channel2Command(last_ch6)) {
             case CMD_OFF:
                 send_event(ManualDrivingEvent());        
@@ -144,23 +144,23 @@ void RosInterface::channels_msg_cb(const robocars_msgs::robocars_radio_channels:
         }
     }
     
-    newCmd.steeringCmd = msg.ch3
-    newCmd.steeringCmd = msg.ch1
+    newCmd.steeringCmd = msg->ch3
+    newCmd.steeringCmd = msg->ch1
     send_event(PowerTraindEvent(newCmd));        
 }
 
-void MissionRosInterface::maintainIdleActuators () {
+void RosInterface::maintainIdleActuators () {
 
     robocars_msgs::robocars_actuator_output steeringMsg;
     robocars_msgs::robocars_actuator_output throttlingMsg;
 
     steeringMsg.header.stamp = ros::Time::now();
-    steeringMsg.header.seq=pos_seq;
+    steeringMsg.header.seq=1;
     steeringMsg.header.frame_id = "mainSteering";
     steeringMsg.pwm = 1500;
 
     throttlingMsg.header.stamp = ros::Time::now();
-    throttlingMsg.header.seq=pos_seq;
+    throttlingMsg.header.seq=1;
     throttlingMsg.header.frame_id = "mainThrottling";
     throttlingMsg.pwm = 1500;   
 
