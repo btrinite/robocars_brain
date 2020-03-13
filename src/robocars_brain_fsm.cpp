@@ -10,7 +10,7 @@
 #include <ros/ros.h>
 #include <stdio.h>
 
-#include <robocars_msgs/robocars_actuators_output.h>
+#include <robocars_msgs/robocars_actuator_output.h>
 #include <robocars_msgs/robocars_debug.h>
 #include <robocars_msgs/robocars_led_status.h>
 #include <robocars_msgs/robocars_radio_channels.h>
