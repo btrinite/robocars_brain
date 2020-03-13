@@ -69,7 +69,7 @@ class onManualDriving
             transit<onIdle>();
         };
 
-        void react(PowerTraindEvent const &e) override {
+        void react(PowerTraindEvent const & e) override {
             RobocarsStateMachine::react(e);
             ri->controlActuators(e.powerTrainCmd); 
         }

@@ -22,15 +22,19 @@ struct BaseEvent : tinyfsm::Event
         const char *  _evtName;
 };
 
+struct ControlEvent : BaseEvent
+{
+  PowerTrainCmd powerTrainCmd;
+};
+
 struct TickEvent                    : BaseEvent { public: TickEvent() : BaseEvent("TickEvent") {}; };
 struct ArmedEvent                   : BaseEvent { public: ArmedEvent() : BaseEvent("ArmedEvent") {}; };
 struct DisarmedEvent                : BaseEvent { public: DisarmedEvent() : BaseEvent("DisarmedEvent") {}; };
 struct ManualDrivingEvent           : BaseEvent { public: ManualDrivingEvent() : BaseEvent("ManualDrivingEvent") {}; };
 struct AutonomousDrivingEvent       : BaseEvent { public: AutonomousDrivingEvent() : BaseEvent("AutonomousDrivingEvent") {}; };
 struct NominalADEvent               : BaseEvent { public: NominalADEvent() : BaseEvent("NominalADEven") {}; };
-struct PowerTraindEvent             : BaseEvent { public: 
+struct PowerTraindEvent             : ControlEvent { public: 
     PowerTraindEvent (const PowerTrainCmd * powerTrainCmdMsg) : powerTrainCmd(*powerTrainCmdMsg), BaseEvent("PowerTraindEvent") {};
-    PowerTrainCmd powerTrainCmd; 
     };
 
 class RobocarsStateMachine
