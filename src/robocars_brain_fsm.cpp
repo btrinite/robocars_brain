@@ -159,7 +159,7 @@ void RosInterface::channels_msg_cb(const robocars_msgs::robocars_radio_channels:
     send_event(PowerTraindEvent(&newCmd));        
 }
 
-void RosInterface::controlActuators (PowerTrainCmd& newCmd) {
+void RosInterface::controlActuators (PowerTrainCmd newCmd) {
 
     robocars_msgs::robocars_actuator_output steeringMsg;
     robocars_msgs::robocars_actuator_output throttlingMsg;
