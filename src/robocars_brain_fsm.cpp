@@ -121,6 +121,14 @@ u_int8_t channel2Command (u_int32_t channelValue) {
     return CMD_AMBIGIOUS;
 }
 
+uint32_t mapRange(uint32_t in1,uint32_t in2,uint32_t out1,uint32_t out2,uint32_t value)
+{
+  if (value<in1) {value=in1;}
+  if (value>in2) {value=in2;}
+  return out1 + ((value-in1)*(out2-out1))/(in2-in1);
+}
+
+
 void RosInterface::channels_msg_cb(const robocars_msgs::robocars_radio_channels::ConstPtr& msg){
     
     PowerTrainCmd newCmd;
@@ -167,12 +175,12 @@ void RosInterface::controlActuators (PowerTrainCmd newCmd) {
     steeringMsg.header.stamp = ros::Time::now();
     steeringMsg.header.seq=1;
     steeringMsg.header.frame_id = "mainSteering";
-    steeringMsg.pwm = newCmd.steeringCmd;
+    steeringMsg.pwm = mapRange(363,1641,1000,2000,newCmd.steeringCmd);
 
     throttlingMsg.header.stamp = ros::Time::now();
     throttlingMsg.header.seq=1;
     throttlingMsg.header.frame_id = "mainThrottling";
-    throttlingMsg.pwm = newCmd.throttlingCmd;   
+    throttlingMsg.pwm = mapRange(372,1675,1000,2000,newCmd.throttlingCmd);   
 
     act_steering_pub.publish(steeringMsg);
     act_throttling_pub.publish(throttlingMsg);
