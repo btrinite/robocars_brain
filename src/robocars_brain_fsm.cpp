@@ -28,7 +28,7 @@ class onIdle
 : public RobocarsStateMachine
 {
     public:
-        onArm() : RobocarsStateMachine("onArm") {};
+        onIdle() : RobocarsStateMachine("onArm") {};
 
     private:
 
@@ -51,7 +51,7 @@ class onManualDriving
 : public RobocarsStateMachine
 {
     public:
-        onEnteringManual() : RobocarsStateMachine("onManualDriving") {};
+        onManualDriving() : RobocarsStateMachine("onManualDriving") {};
 
     private:
 

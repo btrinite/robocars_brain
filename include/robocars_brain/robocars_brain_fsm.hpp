@@ -58,7 +58,7 @@ class RobocarsStateMachine
         virtual void react(ManualDrivingEvent             const & e) { logEvent(e); };
         virtual void react(AutonomousDrivingEvent         const & e) { logEvent(e); };
         virtual void react(NominalADEvent                 const & e) { logEvent(e); };
-        virtual void react(LocalPositionAcquiredEvent     const & e) { };
+        virtual void react(PowerTraindEvent               const & e) { };
 
         virtual void entry(void) { 
             ROS_INFO("State %s: entering", getStateName()); 
