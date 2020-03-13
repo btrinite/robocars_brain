@@ -24,7 +24,8 @@ struct BaseEvent : tinyfsm::Event
 
 struct ControlEvent : BaseEvent
 {
-  PowerTrainCmd powerTrainCmd;
+  public:
+    PowerTrainCmd powerTrainCmd;
 };
 
 struct TickEvent                    : BaseEvent { public: TickEvent() : BaseEvent("TickEvent") {}; };
