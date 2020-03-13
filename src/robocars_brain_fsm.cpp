@@ -131,7 +131,7 @@ void RosInterface::channels_msg_cb(const robocars_msgs::robocars_radio_channels:
             break;
         }
     }
-    if (msg.ch6 != last_ch§) {
+    if (msg.ch6 != last_ch6) {
         //transition
         last_ch6=msg.ch6;
         switch (channel2Command(last_ch6)) {

@@ -29,7 +29,7 @@ struct ManualDrivingEvent           : BaseEvent { public: ManualDrivingEvent() :
 struct AutonomousDrivingEvent       : BaseEvent { public: AutonomousDrivingEvent() : BaseEvent("AutonomousDrivingEvent") {}; };
 struct NominalADEvent               : BaseEvent { public: NominalADEvent() : BaseEvent("NominalADEven") {}; };
 struct PowerTraindEvent             : BaseEvent { public: 
-    (const PowerTrainCmd& powerTrainCmdMsg) : powerTrainCmd(*powerTrainCmdMsg), BaseEvent("PowerTraindEvent") {};
+    PowerTraindEvent (const PowerTrainCmd& powerTrainCmdMsg) : powerTrainCmd(*powerTrainCmdMsg), BaseEvent("PowerTraindEvent") {};
     PowerTrainCmd powerTrainCmd; 
     };
 
