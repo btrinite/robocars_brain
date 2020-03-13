@@ -69,6 +69,11 @@ class onManualDriving
             transit<onIdle>();
         };
 
+        void react(PowerTraindEvent const &e) override {
+            RobocarsStateMachine::react(e);
+            ri->controlActuators(e.powerTrainCmd); 
+        }
+
         void react (TickEvent const & e) override { 
         };
 
@@ -152,6 +157,25 @@ void RosInterface::channels_msg_cb(const robocars_msgs::robocars_radio_channels:
     newCmd.steeringCmd = msg->ch3;
     newCmd.steeringCmd = msg->ch1;
     send_event(PowerTraindEvent(&newCmd));        
+}
+
+void RosInterface::controlActuators (PowerTrainCmd& newCmd) {
+
+    robocars_msgs::robocars_actuator_output steeringMsg;
+    robocars_msgs::robocars_actuator_output throttlingMsg;
+
+    steeringMsg.header.stamp = ros::Time::now();
+    steeringMsg.header.seq=1;
+    steeringMsg.header.frame_id = "mainSteering";
+    steeringMsg.pwm = newCmd->steeringCmd;
+
+    throttlingMsg.header.stamp = ros::Time::now();
+    throttlingMsg.header.seq=1;
+    throttlingMsg.header.frame_id = "mainThrottling";
+    throttlingMsg.pwm = newCmd->throttlingCmd;   
+
+    act_steering_pub.publish(steeringMsg);
+    act_throttling_pub.publish(throttlingMsg);
 }
 
 void RosInterface::maintainIdleActuators () {

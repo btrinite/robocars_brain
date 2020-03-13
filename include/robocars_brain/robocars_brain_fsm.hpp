@@ -101,6 +101,7 @@ class RosInterface
         }
 
         void maintainIdleActuators();
+        void RosInterface::controlActuators (PowerTrainCmd& newCmd);
 
     private:
 
