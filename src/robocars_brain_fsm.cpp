@@ -119,12 +119,14 @@ void RosInterface::channels_msg_cb(const robocars_msgs::robocars_radio_channels:
     
     PowerTrainCmd newCmd;
 
-    static u_int32_t last_ch5 = 0;
-    static u_int32_t last_ch6 = 0;
-    if (msg->ch5 != last_ch5) {
+    static u_int32_t last_ch5_cmd = 0;
+    static u_int32_t last_ch6_cmd = 0;
+    u_int32_t ch5_cmd = channel2Command(msg->ch5);
+    u_int32_t ch6_cmd = channel2Command(msg->ch6);
+    if (ch5_cmd != last_ch5_cmd) {
         //transition
-        last_ch5=msg->ch5;
-        switch (channel2Command(last_ch5)) {
+        last_ch5_cmd=ch5_cmd;
+        switch (ch5_cmd) {
             case CMD_OFF:
                 send_event(DisarmedEvent());        
             break;
@@ -133,10 +135,10 @@ void RosInterface::channels_msg_cb(const robocars_msgs::robocars_radio_channels:
             break;
         }
     }
-    if (msg->ch6 != last_ch6) {
+    if (ch6_cmd != last_ch6_cmd) {
         //transition
-        last_ch6=msg->ch6;
-        switch (channel2Command(last_ch6)) {
+        last_ch6_cmd=ch6_cmd;
+        switch (ch6_cmd) {
             case CMD_OFF:
                 send_event(ManualDrivingEvent());        
             break;
