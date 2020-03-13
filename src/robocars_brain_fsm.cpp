@@ -167,12 +167,12 @@ void RosInterface::controlActuators (PowerTrainCmd newCmd) {
     steeringMsg.header.stamp = ros::Time::now();
     steeringMsg.header.seq=1;
     steeringMsg.header.frame_id = "mainSteering";
-    steeringMsg.pwm = newCmd->steeringCmd;
+    steeringMsg.pwm = newCmd.steeringCmd;
 
     throttlingMsg.header.stamp = ros::Time::now();
     throttlingMsg.header.seq=1;
     throttlingMsg.header.frame_id = "mainThrottling";
-    throttlingMsg.pwm = newCmd->throttlingCmd;   
+    throttlingMsg.pwm = newCmd.throttlingCmd;   
 
     act_steering_pub.publish(steeringMsg);
     act_throttling_pub.publish(throttlingMsg);
