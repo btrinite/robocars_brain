@@ -100,6 +100,8 @@ class onAutonomousDriving
 
 };
 
+FSM_INITIAL_STATE(RobocarsStateMachine, onIdle)
+
 #define CMD_OFF 0
 #define CMD_AMBIGIOUS 1
 #define CMD_ON 2
