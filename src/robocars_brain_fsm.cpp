@@ -56,6 +56,7 @@ class onManualDriving
     private:
 
         void entry(void) override {
+            RobocarsStateMachine::entry();
         };
 
         void react (AutonomousDrivingEvent const & e) override {
