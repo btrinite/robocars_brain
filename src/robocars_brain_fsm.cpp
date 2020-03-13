@@ -144,8 +144,8 @@ void RosInterface::channels_msg_cb(const robocars_msgs::robocars_radio_channels:
         }
     }
     
-    newCmd.steeringCmd = msg->ch3
-    newCmd.steeringCmd = msg->ch1
+    newCmd.steeringCmd = msg->ch3;
+    newCmd.steeringCmd = msg->ch1;
     send_event(PowerTraindEvent(newCmd));        
 }
 
@@ -173,7 +173,7 @@ int main(int argc, char **argv)
     int loopCnt=0;
     ros::init(argc, argv, "robocars_brain_fsm");
 
-    ri = new RobocarsRosInterface;
+    ri = new RosInterface;
 
     fsm_list::start();
 
@@ -183,7 +183,7 @@ int main(int argc, char **argv)
         ros::spinOnce();
         //ros::spin();
         if ((++loopCnt)%100 == 0) {
-            mri->updateParam();
+            ri->updateParam();
         }
         send_event (TickEvent());
         rate.sleep();
