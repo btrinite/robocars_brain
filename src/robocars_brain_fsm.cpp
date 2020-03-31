@@ -13,8 +13,8 @@
 #include <robocars_msgs/robocars_actuator_output.h>
 #include <robocars_msgs/robocars_debug.h>
 #include <robocars_msgs/robocars_led_status.h>
+#include <robocars_msgs/robocars_brain_state.h>
 #include <robocars_msgs/robocars_radio_channels.h>
-#include <robocars_msgs/robocars_tof.h>
 
 #include <robocars_brain_fsm.hpp>
 
@@ -33,6 +33,7 @@ class onIdle
     private:
 
         void entry(void) override {
+            ri->publishBrainState(robocars_msgs::robocars_brain_state::BRAIN_STATE_IDLE);
             RobocarsStateMachine::entry();
         };
   
@@ -42,7 +43,7 @@ class onIdle
         };
 
         void react(TickEvent const & e) override {
-            ri->maintainIdleActuators(); 
+            ri->publishBrainState(robocars_msgs::robocars_brain_state::BRAIN_STATE_IDLE);
         };
 
 };
@@ -56,6 +57,7 @@ class onManualDriving
     private:
 
         void entry(void) override {
+            ri->publishBrainState(robocars_msgs::robocars_brain_state::BRAIN_STATE_MANUAL_DRIVING);
             RobocarsStateMachine::entry();
         };
 
@@ -69,12 +71,8 @@ class onManualDriving
             transit<onIdle>();
         };
 
-        void react(PowerTraindEvent const & e) override {
-            RobocarsStateMachine::react(e);
-            ri->controlActuators(e.powerTrainCmd); 
-        }
-
         void react (TickEvent const & e) override { 
+            ri->publishBrainState(robocars_msgs::robocars_brain_state::BRAIN_STATE_MANUAL_DRIVING);
         };
 
 };
@@ -88,11 +86,9 @@ class onAutonomousDriving
     protected:
 
         virtual void entry(void) { 
+            ri->publishBrainState(robocars_msgs::robocars_brain_state::BRAIN_STATE_AUTONOMOUS_DRIVING);
             RobocarsStateMachine::entry();
         };  
-
-        virtual void react(TickEvent                      const & e) override { 
-        };
 
         virtual void react(DisarmedEvent                 const & e) override { 
             RobocarsStateMachine::react(e);
@@ -104,6 +100,11 @@ class onAutonomousDriving
             transit<onManualDriving>();
         };
 
+        virtual void react(TickEvent                      const & e) override { 
+            ri->publishBrainState(robocars_msgs::robocars_brain_state::BRAIN_STATE_AUTONOMOUS_DRIVING);
+        };
+
+
 };
 
 FSM_INITIAL_STATE(RobocarsStateMachine, onIdle)
@@ -111,6 +112,7 @@ FSM_INITIAL_STATE(RobocarsStateMachine, onIdle)
 #define CMD_OFF 0
 #define CMD_AMBIGIOUS 1
 #define CMD_ON 2
+
 u_int8_t channel2Command (u_int32_t channelValue) {
     if ((channelValue)<1400) {
         return CMD_OFF;
@@ -121,18 +123,8 @@ u_int8_t channel2Command (u_int32_t channelValue) {
     return CMD_AMBIGIOUS;
 }
 
-uint32_t mapRange(uint32_t in1,uint32_t in2,uint32_t out1,uint32_t out2,uint32_t value)
-{
-  if (value<in1) {value=in1;}
-  if (value>in2) {value=in2;}
-  return out1 + ((value-in1)*(out2-out1))/(in2-in1);
-}
-
-
 void RosInterface::channels_msg_cb(const robocars_msgs::robocars_radio_channels::ConstPtr& msg){
     
-    PowerTrainCmd newCmd;
-
     static u_int32_t last_ch5_cmd = 0;
     static u_int32_t last_ch6_cmd = 0;
     u_int32_t ch5_cmd = channel2Command(msg->ch5);
@@ -160,49 +152,30 @@ void RosInterface::channels_msg_cb(const robocars_msgs::robocars_radio_channels:
                 send_event(AutonomousDrivingEvent());        
             break;
         }
-    }
-    
-    newCmd.throttlingCmd = msg->ch3;
-    newCmd.steeringCmd = msg->ch1;
-    send_event(PowerTraindEvent(&newCmd));        
+    }    
 }
 
-void RosInterface::controlActuators (PowerTrainCmd newCmd) {
-
-    robocars_msgs::robocars_actuator_output steeringMsg;
-    robocars_msgs::robocars_actuator_output throttlingMsg;
-
-    steeringMsg.header.stamp = ros::Time::now();
-    steeringMsg.header.seq=1;
-    steeringMsg.header.frame_id = "mainSteering";
-    steeringMsg.pwm = mapRange(363,1641,1000,2000,newCmd.steeringCmd);
-
-    throttlingMsg.header.stamp = ros::Time::now();
-    throttlingMsg.header.seq=1;
-    throttlingMsg.header.frame_id = "mainThrottling";
-    throttlingMsg.pwm = mapRange(372,1675,1000,2000,newCmd.throttlingCmd);   
-
-    act_steering_pub.publish(steeringMsg);
-    act_throttling_pub.publish(throttlingMsg);
+void RosInterface::updateParam() {
 }
 
-void RosInterface::maintainIdleActuators () {
+void RosInterface::initPub () {
+    brain_state_pub = nh.advertise<robocars_msgs::robocars_brain_state>("robocars_brain_state", 10);
+}
 
-    robocars_msgs::robocars_actuator_output steeringMsg;
-    robocars_msgs::robocars_actuator_output throttlingMsg;
+void RosInterface::initSub () {
+    channels_sub = nh.subscribe<robocars_msgs::robocars_radio_channels>("radio_channels", 1, &RosInterface::channels_msg_cb, this);
+}
 
-    steeringMsg.header.stamp = ros::Time::now();
-    steeringMsg.header.seq=1;
-    steeringMsg.header.frame_id = "mainSteering";
-    steeringMsg.pwm = 1500;
+void RosInterface::publishBrainState (uint32_t state) {
 
-    throttlingMsg.header.stamp = ros::Time::now();
-    throttlingMsg.header.seq=1;
-    throttlingMsg.header.frame_id = "mainThrottling";
-    throttlingMsg.pwm = 1500;   
+    robocars_msgs::robocars_brain_state newState;
 
-    act_steering_pub.publish(steeringMsg);
-    act_throttling_pub.publish(throttlingMsg);
+    newState.header.stamp = ros::Time::now();
+    newState.header.seq=1;
+    newState.header.frame_id = "brainState";
+    newState.state = state;
+
+    brain_state_pub.publish(newState);
 }
 
 int main(int argc, char **argv)
@@ -212,12 +185,14 @@ int main(int argc, char **argv)
 
     ri = new RosInterface;
 
+    ri->initPub();
     fsm_list::start();
+    ri->initSub();
 
     ROS_INFO("Brain: Starting");
 
     // wait for FCU connection
-    ros::Rate rate(500.0);
+    ros::Rate rate(10.0);
     while(ros::ok()){
         ros::spinOnce();
         //ros::spin();

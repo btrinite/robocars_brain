@@ -28,11 +28,6 @@ struct DisarmedEvent                : BaseEvent { public: DisarmedEvent() : Base
 struct ManualDrivingEvent           : BaseEvent { public: ManualDrivingEvent() : BaseEvent("ManualDrivingEvent") {}; };
 struct AutonomousDrivingEvent       : BaseEvent { public: AutonomousDrivingEvent() : BaseEvent("AutonomousDrivingEvent") {}; };
 struct NominalADEvent               : BaseEvent { public: NominalADEvent() : BaseEvent("NominalADEven") {}; };
-struct PowerTraindEvent             : BaseEvent { public: 
-    PowerTraindEvent (const PowerTrainCmd * powerTrainCmdMsg) : powerTrainCmd(*powerTrainCmdMsg), BaseEvent("PowerTraindEvent") {};
-    public:
-        PowerTrainCmd powerTrainCmd;
-    };
 
 class RobocarsStateMachine
 : public tinyfsm::Fsm<RobocarsStateMachine>
@@ -42,10 +37,6 @@ class RobocarsStateMachine
             ROS_INFO("RobocarsStateMachine: State created: %s", _stateName);      
         };
         const char * getStateName() const { return _stateName; };
-
-    public:
-        static float destX;
-        static float destY;
 
     public:
         /* default reaction for unhandled events */
@@ -59,7 +50,6 @@ class RobocarsStateMachine
         virtual void react(ManualDrivingEvent             const & e) { logEvent(e); };
         virtual void react(AutonomousDrivingEvent         const & e) { logEvent(e); };
         virtual void react(NominalADEvent                 const & e) { logEvent(e); };
-        virtual void react(PowerTraindEvent               const & e) { };
 
         virtual void entry(void) { 
             ROS_INFO("State %s: entering", getStateName()); 
@@ -81,37 +71,26 @@ void send_event(E const & event)
   fsm_list::template dispatch<E>(event);
 }
 
-/*
-void state_cb(const mavros_msgs::State::ConstPtr& msg);
-void pose_cb(const geometry_msgs::PoseStamped::ConstPtr& pose_msg);
-void mission_cb(const mavros_msgs::WaypointList::ConstPtr& mission_msg);
-void customer_cb(const std_msgs::StringConstPtr& str);
-*/
-
 class RosInterface
 {
     public :
         RosInterface() {
             updateParam();
-            channels_sub = nh.subscribe<robocars_msgs::robocars_radio_channels>("radio_channels", 1, &RosInterface::channels_msg_cb, this);
-            act_steering_pub = nh.advertise<robocars_msgs::robocars_actuator_output>("steering", 10);
-            act_throttling_pub = nh.advertise<robocars_msgs::robocars_actuator_output>("throttling", 10);
         };
 
-        void updateParam() {
-        }
+        void initPub();
+        void initSub();
 
-        void maintainIdleActuators();
-        void controlActuators (PowerTrainCmd newCmd);
+        void updateParam();
+
+        void publishBrainState(uint32_t state);
 
     private:
 
         void channels_msg_cb(const robocars_msgs::robocars_radio_channels::ConstPtr& msg);
 
-        ros::Publisher act_steering_pub;
-        ros::Publisher act_throttling_pub;
-
         ros::NodeHandle nh;
+        ros::Publisher brain_state_pub;    
         ros::Subscriber channels_sub;
 
 };
