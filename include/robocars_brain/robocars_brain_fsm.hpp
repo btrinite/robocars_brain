@@ -54,7 +54,7 @@ class RobocarsStateMachine
         virtual void entry(void) { 
             ROS_INFO("State %s: entering", getStateName()); 
         };  
-        void         exit(void)  { };  /* no exit actions */
+        virtual void exit(void)  { };  /* no exit actions */
 
     private:
         const char *  _stateName ="NoName";

@@ -18,6 +18,7 @@
 
 #include <robocars_brain_fsm.hpp>
 
+#define LOOPHZ  10
 RosInterface * ri;
 
 class onIdle;
@@ -192,11 +193,11 @@ int main(int argc, char **argv)
     ROS_INFO("Brain: Starting");
 
     // wait for FCU connection
-    ros::Rate rate(10.0);
+    ros::Rate rate(LOOPHZ);
     while(ros::ok()){
         ros::spinOnce();
         //ros::spin();
-        if ((++loopCnt)%100 == 0) {
+        if ((++loopCnt)%(1000/LOOPHZ) == 0) {
             ri->updateParam();
         }
         send_event (TickEvent());
