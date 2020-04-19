@@ -41,10 +41,10 @@ class onIdle
         onIdle() : RobocarsStateMachine("onArm") {};
 
     private:
+        uint32_t __tick_count;
 
         void entry(void) override {
             ri->publishBrainState(robocars_msgs::robocars_brain_state::BRAIN_STATE_IDLE);
-            ri->publishDebug(myIP);
             RobocarsStateMachine::entry();
         };
   
@@ -54,7 +54,13 @@ class onIdle
         };
 
         void react(TickEvent const & e) override {
+            __tick_count++;
             ri->publishBrainState(robocars_msgs::robocars_brain_state::BRAIN_STATE_IDLE);
+            if ((__tick_count%LOOPHZ)==0) {
+                //Update param each second
+                ri->updateParam(); 
+                ri->publishDebug(myIP);
+            }
         };
 
 };
