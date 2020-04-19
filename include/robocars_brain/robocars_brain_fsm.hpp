@@ -75,15 +75,19 @@ class RosInterface
 {
     public :
         RosInterface() {
+            initParam();
             updateParam();
         };
 
         void initPub();
         void initSub();
 
+        void initParam();
         void updateParam();
 
+        void getIPAddress();
         void publishBrainState(uint32_t state);
+        void publishDebug(std::string const& msg);
 
     private:
 
@@ -91,6 +95,7 @@ class RosInterface
 
         ros::NodeHandle nh;
         ros::Publisher brain_state_pub;    
+        ros::Publisher debug_pub;    
         ros::Subscriber channels_sub;
 
 };

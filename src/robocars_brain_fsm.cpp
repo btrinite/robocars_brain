@@ -10,6 +10,12 @@
 #include <ros/ros.h>
 #include <stdio.h>
 
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <netinet/in.h>
+#include <net/if.h>
+#include <arpa/inet.h>
+ 
 #include <robocars_msgs/robocars_actuator_output.h>
 #include <robocars_msgs/robocars_debug.h>
 #include <robocars_msgs/robocars_led_status.h>
@@ -20,6 +26,9 @@
 
 #define LOOPHZ  10
 RosInterface * ri;
+std::string myIP;
+static std::string mainIPInterface;
+
 
 class onIdle;
 class onManualDriving;
@@ -35,6 +44,7 @@ class onIdle
 
         void entry(void) override {
             ri->publishBrainState(robocars_msgs::robocars_brain_state::BRAIN_STATE_IDLE);
+            ri->publishDebug(myIP);
             RobocarsStateMachine::entry();
         };
   
@@ -156,11 +166,18 @@ void RosInterface::channels_msg_cb(const robocars_msgs::robocars_radio_channels:
     }    
 }
 
+void RosInterface::initParam() {
+    if (!nh.hasParam("mainIPInterface")) {
+        nh.setParam ("mainIPInterface", "lo");       
+    }
+}
 void RosInterface::updateParam() {
+    nh.getParam("mainIPInterface", mainIPInterface);
 }
 
 void RosInterface::initPub () {
     brain_state_pub = nh.advertise<robocars_msgs::robocars_brain_state>("robocars_brain_state", 10);
+    debug_pub = nh.advertise<robocars_msgs::robocars_debug>("robocars_debug", 10);
 }
 
 void RosInterface::initSub () {
@@ -179,6 +196,45 @@ void RosInterface::publishBrainState (uint32_t state) {
     brain_state_pub.publish(newState);
 }
 
+void RosInterface::getIPAddress()
+{
+    int fd;
+    struct ifreq ifr;
+    char ip_address[15];
+
+    /*AF_INET - to define network interface IPv4*/
+    /*Creating soket for it.*/
+    fd = socket(AF_INET, SOCK_DGRAM, 0);
+     
+    /*AF_INET - to define IPv4 Address type.*/
+    ifr.ifr_addr.sa_family = AF_INET;
+     
+    /*eth0 - define the ifr_name - port name
+    where network attached.*/
+    memcpy(ifr.ifr_name, mainIPInterface.c_str(), IFNAMSIZ-1);
+     
+    /*Accessing network interface information by
+    passing address using ioctl.*/
+    ioctl(fd, SIOCGIFADDR, &ifr);
+    /*closing fd*/
+    close(fd);
+     
+    /*Extract IP Address*/
+    strcpy(ip_address,inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr));
+    myIP = std::string(ip_address); 
+}
+
+void RosInterface::publishDebug (std::string const& msg) {
+    robocars_msgs::robocars_debug debugMsg;
+
+    debugMsg.header.stamp = ros::Time::now();
+    debugMsg.header.seq=1;
+    debugMsg.header.frame_id = "debug";
+    debugMsg.msg = msg;
+
+    debug_pub.publish(debugMsg);
+}
+
 int main(int argc, char **argv)
 {
     int loopCnt=0;
@@ -189,7 +245,7 @@ int main(int argc, char **argv)
     ri->initPub();
     fsm_list::start();
     ri->initSub();
-
+    ri->getIPAddress();
     ROS_INFO("Brain: Starting");
 
     // wait for FCU connection
