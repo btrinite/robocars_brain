@@ -1,11 +1,18 @@
 /**
- * @file offb_raw_node.cpp
- * @brief Offboard control example node, written with MAVROS version 0.19.x, PX4 Pro Flight
- * Stack and tested in Gazebo SITL
- source $src_path/Tools/setup_gazebo.bash ${src_path} ${build_path}
-
- gzserver --verbose ${src_path}/Tools/sitl_gazebo/worlds/${model}.world &
+ * @file robocars_brain_fsm.cpp
+ * @brief Main car FSM, hold car global state.
+ * 
+ * Topic subscribed : 
+ *  - /radio_channels : to get command from radio controller
+ * 
+ * Topic published :
+ *  - /robocars_brain_state : to broadcast car state to any other ROS node
+ *  - /robocars_debug : to send debug message on ESP32 companion 
+ * 
+ * Parameters :
+ *  - mainIPInterface : the name of the main IP interface for which current IP address is reported in debug msg
  */
+
 #include <tinyfsm.hpp>
 #include <ros/ros.h>
 #include <stdio.h>
@@ -24,7 +31,8 @@
 
 #include <robocars_brain_fsm.hpp>
 
-#define LOOPHZ  10
+#define LOOPHZ  1 /*config update and debug msg rate for IP address reporting*/
+
 RosInterface * ri;
 std::string myIP;
 static std::string mainIPInterface;
@@ -126,6 +134,7 @@ class onAutonomousDriving
 
 FSM_INITIAL_STATE(RobocarsStateMachine, onIdle)
 
+// logic to convert radio channel to state 
 #define CMD_OFF 0
 #define CMD_AMBIGIOUS 1
 #define CMD_ON 2
