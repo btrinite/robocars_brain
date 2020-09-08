@@ -173,8 +173,8 @@ void RosInterface::channels_msg_cb(const robocars_msgs::robocars_radio_channels:
     
     static u_int32_t last_ch5_cmd = 0;
     static u_int32_t last_ch6_cmd = 0;
-    u_int32_t ch5_cmd = channel2Command(msg->ch5);
-    u_int32_t ch6_cmd = channel2Command(msg->ch6);
+    u_int32_t ch5_cmd = channel2Command(msg->channels[4]);
+    u_int32_t ch6_cmd = channel2Command(msg->channels[5]);
     if (ch5_cmd != last_ch5_cmd) {
         //transition
         last_ch5_cmd=ch5_cmd;
