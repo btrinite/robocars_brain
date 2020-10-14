@@ -211,8 +211,8 @@ void RosInterface::updateParam() {
 }
 
 void RosInterface::initPub () {
-    brain_state_pub = nh.advertise<robocars_msgs::robocars_brain_state>("robocars_brain_state", 10);
-    debug_pub = nh.advertise<robocars_msgs::robocars_debug>("robocars_debug", 10);
+    brain_state_pub = nh.advertise<robocars_msgs::robocars_brain_state>("robocars_brain_state", 1);
+    debug_pub = nh.advertise<robocars_msgs::robocars_debug>("robocars_debug", 1);
 }
 
 void RosInterface::initSub () {
