@@ -127,11 +127,15 @@ class RosInterface
     private:
 
         void channels_msg_cb(const robocars_msgs::robocars_radio_channels::ConstPtr& msg);
+        void rc_driving_msg_cb(const std_msgs::Int16::ConstPtr& msg);
+        void rc_autopilot_msg_cb(const std_msgs::Int16::ConstPtr& msg);
 
         ros::NodeHandle nh;
         ros::Publisher brain_state_pub;    
         ros::Publisher debug_pub;    
         ros::Subscriber channels_sub;
+        ros::Subscriber remote_control_driving;
+        ros::Subscriber remote_control_autopilot;
 
 };
 

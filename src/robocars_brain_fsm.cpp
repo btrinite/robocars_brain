@@ -48,6 +48,7 @@
 #include <robocars_msgs/robocars_led_status.h>
 #include <robocars_msgs/robocars_brain_state.h>
 #include <robocars_msgs/robocars_radio_channels.h>
+#include <std_msgs/Int16.h>
 
 #include <robocars_brain_fsm.hpp>
 
@@ -201,6 +202,19 @@ void RosInterface::channels_msg_cb(const robocars_msgs::robocars_radio_channels:
     }    
 }
 
+void RosInterface::rc_driving_msg_cb(const std_msgs::Int16::ConstPtr& msg) {
+    if (msg->data == 1) {
+        send_event(ArmedEvent());        
+    }
+}
+
+void RosInterface::rc_autopilot_msg_cb(const std_msgs::Int16::ConstPtr& msg) {
+    if (msg->data == 1) {
+        send_event(AutonomousDrivingEvent());        
+    }
+}
+
+
 void RosInterface::initParam() {
     if (!nh.hasParam("mainIPInterface")) {
         nh.setParam ("mainIPInterface", "lo");       
@@ -217,6 +231,8 @@ void RosInterface::initPub () {
 
 void RosInterface::initSub () {
     channels_sub = nh.subscribe<robocars_msgs::robocars_radio_channels>("radio_channels", 1, &RosInterface::channels_msg_cb, this);
+    remote_control_driving = nh.subscribe<std_msgs::Int16>("radio_channels", 1, &RosInterface::rc_driving_msg_cb, this);
+    remote_control_autopilot = nh.subscribe<std_msgs::Int16>("radio_channels", 1, &RosInterface::rc_autopilot_msg_cb, this);
 }
 
 void RosInterface::publishBrainState (uint32_t state) {
