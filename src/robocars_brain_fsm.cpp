@@ -205,12 +205,16 @@ void RosInterface::channels_msg_cb(const robocars_msgs::robocars_radio_channels:
 void RosInterface::rc_driving_msg_cb(const std_msgs::Int16::ConstPtr& msg) {
     if (msg->data == 1) {
         send_event(ArmedEvent());        
+    } else {
+        send_event(DisarmedEvent());        
     }
 }
 
 void RosInterface::rc_autopilot_msg_cb(const std_msgs::Int16::ConstPtr& msg) {
     if (msg->data == 1) {
         send_event(AutonomousDrivingEvent());        
+    } else {
+        send_event(ManualDrivingEvent());        
     }
 }
 
