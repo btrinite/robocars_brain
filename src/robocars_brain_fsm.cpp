@@ -230,9 +230,9 @@ void RosInterface::initPub () {
 }
 
 void RosInterface::initSub () {
-    channels_sub = nh.subscribe<robocars_msgs::robocars_radio_channels>("radio_channels", 1, &RosInterface::channels_msg_cb, this);
-    remote_control_driving = nh.subscribe<std_msgs::Int16>("radio_channels", 1, &RosInterface::rc_driving_msg_cb, this);
-    remote_control_autopilot = nh.subscribe<std_msgs::Int16>("radio_channels", 1, &RosInterface::rc_autopilot_msg_cb, this);
+    channels_sub = nh.subscribe<robocars_msgs::robocars_radio_channels>("/radio_channels", 1, &RosInterface::channels_msg_cb, this);
+    remote_control_driving = nh.subscribe<std_msgs::Int16>("/remote_control/enable_driving", 1, &RosInterface::rc_driving_msg_cb, this);
+    remote_control_autopilot = nh.subscribe<std_msgs::Int16>("/remote_control/enable_autopilot", 1, &RosInterface::rc_autopilot_msg_cb, this);
 }
 
 void RosInterface::publishBrainState (uint32_t state) {
