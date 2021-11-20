@@ -43,6 +43,8 @@
 #include <net/if.h>
 #include <arpa/inet.h>
  
+#include <std_msgs/Int16MultiArray.h>
+
 #include <robocars_msgs/robocars_actuator_output.h>
 #include <robocars_msgs/robocars_debug.h>
 #include <robocars_msgs/robocars_led_status.h>
@@ -170,12 +172,12 @@ u_int8_t channel2Command (u_int32_t channelValue) {
     return CMD_AMBIGIOUS;
 }
 
-void RosInterface::channels_msg_cb(const robocars_msgs::robocars_radio_channels::ConstPtr& msg){
+void RosInterface::channels_msg_cb(const std_msgs::Int16MultiArray::ConstPtr& msg){
     
     static u_int32_t last_ch5_cmd = 0;
     static u_int32_t last_ch6_cmd = 0;
-    u_int32_t ch5_cmd = channel2Command(msg->channels[4]);
-    u_int32_t ch6_cmd = channel2Command(msg->channels[5]);
+    u_int32_t ch5_cmd = channel2Command(msg->data[4]);
+    u_int32_t ch6_cmd = channel2Command(msg->data[5]);
     if (ch5_cmd != last_ch5_cmd) {
         //transition
         last_ch5_cmd=ch5_cmd;
@@ -234,7 +236,7 @@ void RosInterface::initPub () {
 }
 
 void RosInterface::initSub () {
-    channels_sub = nh.subscribe<robocars_msgs::robocars_radio_channels>("/radio_channels", 1, &RosInterface::channels_msg_cb, this);
+    channels_sub = nh.subscribe<std_msgs::Int16MultiArray>("/radio_channels", 1, &RosInterface::channels_msg_cb, this);
     remote_control_driving = nh.subscribe<std_msgs::Int16>("/remote_control/enable_driving", 1, &RosInterface::rc_driving_msg_cb, this);
     remote_control_autopilot = nh.subscribe<std_msgs::Int16>("/remote_control/enable_autopilot", 1, &RosInterface::rc_autopilot_msg_cb, this);
 }

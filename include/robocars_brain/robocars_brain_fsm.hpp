@@ -37,6 +37,8 @@
 #include <ros/ros.h>
 #include <stdio.h>
 
+#include <std_msgs/Int16MultiArray.h>
+
 #include <robocars_msgs/robocars_actuator_output.h>
 #include <robocars_msgs/robocars_debug.h>
 #include <robocars_msgs/robocars_led_status.h>
@@ -126,7 +128,7 @@ class RosInterface
 
     private:
 
-        void channels_msg_cb(const robocars_msgs::robocars_radio_channels::ConstPtr& msg);
+        void channels_msg_cb(const std_msgs::Int16MultiArray::ConstPtr& msg);
         void rc_driving_msg_cb(const std_msgs::Int16::ConstPtr& msg);
         void rc_autopilot_msg_cb(const std_msgs::Int16::ConstPtr& msg);
 
