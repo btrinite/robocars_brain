@@ -176,8 +176,8 @@ void RosInterface::channels_msg_cb(const std_msgs::Int16MultiArray::ConstPtr& ms
     
     static u_int32_t last_ch5_cmd = 0;
     static u_int32_t last_ch6_cmd = 0;
-    u_int32_t ch5_cmd = channel2Command(msg->data[4]);
-    u_int32_t ch6_cmd = channel2Command(msg->data[5]);
+    u_int32_t ch5_cmd = channel2Command(msg->data[2]);
+    u_int32_t ch6_cmd = channel2Command(msg->data[3]);
     if (ch5_cmd != last_ch5_cmd) {
         //transition
         last_ch5_cmd=ch5_cmd;
