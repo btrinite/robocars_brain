@@ -54,7 +54,7 @@
 
 #include <robocars_brain_fsm.hpp>
 
-#define LOOPHZ  1 /*config update and debug msg rate for IP address reporting*/
+#define LOOPHZ  10 /*config update and debug msg rate for IP address reporting*/
 
 RosInterface * ri;
 std::string myIP;
